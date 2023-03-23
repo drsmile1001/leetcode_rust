@@ -9,29 +9,48 @@ use crate::solution::Solution;
 // @lc code=start
 impl Solution {
     pub fn is_valid(s: String) -> bool {
-        let mut chars = s.chars();
+        let chars = s.chars();
 
-        Self::closed_by(&mut chars, None)
+        let (_, result) = Self::closed_by(chars, None);
+        result
     }
 
-    fn closed_by(chars: &mut std::str::Chars, closed_by_char: core::option::Option<char>) -> bool {
+    fn closed_by(
+        mut chars: std::str::Chars,
+        closed_by_char: core::option::Option<char>,
+    ) -> (std::str::Chars, bool) {
         let next_char = chars.next();
 
         if next_char == closed_by_char {
-            return true;
+            return (chars, true);
         }
 
         match next_char {
             Some('(') => {
-                Self::closed_by(chars, Some(')')) && Self::closed_by(chars, closed_by_char)
+                let (chars, result) = Self::closed_by(chars, Some(')'));
+                if result {
+                    return Self::closed_by(chars, closed_by_char);
+                } else {
+                    return (chars, false);
+                }
             }
             Some('[') => {
-                Self::closed_by(chars, Some(']')) && Self::closed_by(chars, closed_by_char)
+                let (chars, result) = Self::closed_by(chars, Some(']'));
+                if result {
+                    return Self::closed_by(chars, closed_by_char);
+                } else {
+                    return (chars, false);
+                }
             }
             Some('{') => {
-                Self::closed_by(chars, Some('}')) && Self::closed_by(chars, closed_by_char)
+                let (chars, result) = Self::closed_by(chars, Some('}'));
+                if result {
+                    return Self::closed_by(chars, closed_by_char);
+                } else {
+                    return (chars, false);
+                }
             }
-            _ => false,
+            _ => (chars, false),
         }
     }
 }
